@@ -1,0 +1,3 @@
+rootProject.name = 'aws-gen'
+
+include("client", "core", "generated", "generator", "parser", "synthesizer")

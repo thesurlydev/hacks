@@ -1,0 +1,5 @@
+.doc-cache
+.gradle
+build
+generator/etc/doc-cache
+out
