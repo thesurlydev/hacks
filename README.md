@@ -1,2 +1,2 @@
 # hacks
-A collection of projects and one-off scripts. All a work in progress.
+A collection of projects and one-off scripts. All are a work in progress.
