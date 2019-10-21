@@ -1,0 +1,17 @@
+#!/bin/bash
+
+source common.sh
+
+if [[ $# != 2 ]]; then
+    echo ""
+    echo "Usage: ec2-create-image [INSTANCE_ID] [NAME]"
+    echo ""
+fi
+
+INSTANCE_ID=$1
+NAME=$2
+
+aws ec2 create-image --name $NAME --instance-id $INSTANCE_ID --profile $PROFILE --region $REGION | jq .
+
+# TODO wait for completion
+# TODO add option to kill instance the new image is derived from
