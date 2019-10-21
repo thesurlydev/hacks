@@ -1,0 +1,92 @@
+{
+  "AWSTemplateFormatVersion":"2010-09-09",
+  "Description":"Regional Internet Registry DynamoDB Table and Indexes",
+  "Parameters":{
+    "RirRCU":{
+      "Description":"Provisioned read throughput for networking.rir table",
+      "Type":"Number",
+      "Default":1,
+      "MinValue":1,
+      "MaxValue":1000,
+      "ConstraintDescription":"must be between 1 and 1000"
+    },
+    "TypeExtensionIndexRCU":{
+      "Description":"Provisioned read throughput for TypeExtensionIndex on networking.rir table",
+      "Type":"Number",
+      "Default":1,
+      "MinValue":1,
+      "MaxValue":1000,
+      "ConstraintDescription":"must be between 1 and 1000"
+    },
+    "RirWCU":{
+      "Description":"Provisioned write throughput for networking.rir table",
+      "Type":"Number",
+      "Default":1,
+      "MinValue":1,
+      "MaxValue":1000,
+      "ConstraintDescription":"must be between 1 and 1000"
+    }
+  },
+  "Resources":{
+    "RirTable":{
+      "Type":"AWS::DynamoDB::Table",
+      "Properties":{
+        "AttributeDefinitions":[
+          {
+            "AttributeName":"id",
+            "AttributeType":"S"
+          },
+          {
+            "AttributeName":"type",
+            "AttributeType":"S"
+          },
+          {
+            "AttributeName":"typeExtension",
+            "AttributeType":"S"
+          }
+        ],
+        "KeySchema":[
+          {
+            "AttributeName":"id",
+            "KeyType":"HASH"
+          }
+        ],
+        "ProvisionedThroughput":{
+          "ReadCapacityUnits":{
+            "Ref":"RirRCU"
+          },
+          "WriteCapacityUnits":{
+            "Ref":"RirWCU"
+          }
+        },
+        "TableName":"networking.rir",
+        "GlobalSecondaryIndexes":[
+          {
+            "IndexName":"typeExtensionIndex",
+            "KeySchema":[
+              {
+                "AttributeName":"typeExtension",
+                "KeyType":"HASH"
+              },
+              {
+                "AttributeName":"type",
+                "KeyType":"RANGE"
+              }
+            ],
+            "Projection":{
+              "ProjectionType":"ALL"
+            },
+            "ProvisionedThroughput":{
+              "ReadCapacityUnits":{
+                "Ref":"TypeExtensionIndexRCU"
+              },
+              "WriteCapacityUnits":{
+                "Ref":"RirWCU"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
