@@ -6,3 +6,4 @@ A collection of projects and one-off scripts. All are a work in progress.
 * [utils](utils)
 * [aws-poller](aws-poller)
 * [circleci-client](circleci-client)
+* [simple-server](simple-server)
