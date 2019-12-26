@@ -17,8 +17,13 @@ public class PostgreSQLImporter {
 
   private static final Logger log = LoggerFactory.getLogger(PostgreSQLImporter.class);
 
-  private final String url = "jdbc:postgresql://localhost:5432/postgres";
-  private final String user = "switbe";
+  private static final String url = "jdbc:postgresql://localhost:5432/postgres";
+  private static final String user = "postgres";
+  private static final String password = "postgres";
+  private static final String schema = "networking";
+  private static final String table = "rir";
+  private static final String qualifiedTable = schema + "." + table;
+  private static final String INSERT_SQL = "INSERT INTO " + qualifiedTable + " (registry, cc, type, start, value, date, status, extensions) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
   /**
    * Connect to the PostgreSQL database
@@ -28,22 +33,20 @@ public class PostgreSQLImporter {
   public Connection connect() {
     Connection conn = null;
     try {
-      conn = DriverManager.getConnection(url, user, null);
+      conn = DriverManager.getConnection(url, user, password);
       System.out.println("Connected to the PostgreSQL server successfully.");
     } catch (SQLException e) {
       System.out.println(e.getMessage());
     }
     return conn;
   }
-  
-  public void importData() {
-    String downloadDir = "/Users/switbe/projects/rir-processor/downloads";
-    RecordParser parser = new RecordParser();    
-    List<Record> records = parser.parse(Paths.get(downloadDir));    
-    insert(records);    
-  }
 
-  private static final String INSERT_SQL = "INSERT INTO networking.rir (registry, cc, type, start, value, date, status, extensions) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+  public void importData() {
+    String downloadDir = "downloads";
+    RecordParser parser = new RecordParser();
+    List<Record> records = parser.parse(Paths.get(downloadDir));
+    insert(records);
+  }
 
   private void insert(List<Record> records) {
     try (Connection conn = connect(); PreparedStatement ps = conn.prepareStatement(INSERT_SQL)) {
@@ -76,9 +79,10 @@ public class PostgreSQLImporter {
 
 
   public void setupTables() {
-    Flyway flyway = new Flyway();
-    flyway.setDataSource(url, user, null);
-    flyway.setSchemas("networking");
+    Flyway flyway = Flyway.configure().dataSource(url, user, password)
+            .schemas(schema)
+            .defaultSchema(schema)
+            .load();
     flyway.clean(); // just rerun all migrations every time
     flyway.migrate();
   }
